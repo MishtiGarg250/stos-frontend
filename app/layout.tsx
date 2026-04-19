@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { AuthProvider } from "@/components/providers/AuthProvider";
 
 export const metadata: Metadata = {
   title: "STUDENT OS | ALPHA",
-  description: "students os",
+  description: "A decentralized student operating system for the next generation.",
 };
 
 export default function RootLayout({
@@ -12,9 +13,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full antialiased">
-      <body className="bg-background text-foreground h-full overflow-hidden">
-        {children}
+    <html lang="en" className="h-full">
+      <body className="bg-background text-foreground h-full">
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

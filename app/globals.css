@@ -1,23 +1,22 @@
-@import url('https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;700&family=Bebas+Neue&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Outfit:wght@300;400;600;700&display=swap');
 @import "tailwindcss";
 
 :root {
   --background: #020617;
   --foreground: #f8fafc;
-  --zine-green: #0F1F1C;
   --zine-coral: #FF6B35;
+  --zine-green: #0F1F1C;
   --zine-paper: #FDFCF0;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-zine-green: var(--zine-green);
   --color-zine-coral: var(--zine-coral);
+  --color-zine-green: var(--zine-green);
   --color-zine-paper: var(--zine-paper);
-  --font-zine: "Anton", sans-serif;
-  --font-bebas: "Bebas Neue", sans-serif;
-  --font-sans: "Inter", sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-sans: "Outfit", sans-serif;
 }
 
 body {
@@ -25,20 +24,44 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3 {
-  font-family: var(--font-zine);
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: -0.02em;
 }
 
-.zine-card {
-  @apply bg-zine-green border-2 border-zine-coral p-6 relative;
+/* AETHER DESIGN SYSTEM (ZINE_REMIX) */
+
+.aether-card {
+  @apply bg-zinc-950 border-2 border-zinc-900 p-6 relative transition-all duration-300 overflow-hidden flex flex-col;
   box-shadow: 8px 8px 0px var(--zine-coral);
 }
 
-.zine-button {
-  @apply bg-zine-coral text-zine-green font-bebas text-2xl px-6 py-2 transition-all hover:translate-x-1 hover:translate-y-1 hover:shadow-none;
+.aether-card:hover {
+  @apply translate-x-[-2px] translate-y-[-2px] border-zine-coral/30;
+  box-shadow: 12px 12px 0px var(--zine-coral);
+}
+
+.aether-button {
+  @apply bg-zine-coral text-zinc-950 font-display font-bold px-8 py-3 transition-all hover:bg-white active:scale-95 uppercase tracking-widest;
   box-shadow: 4px 4px 0px black;
+}
+
+.aether-input {
+  @apply w-full bg-zinc-900 border-2 border-zinc-800 p-4 font-sans text-white focus:border-zine-coral focus:outline-none transition-all;
+}
+
+/* CUSTOM SCROLLBAR */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-zinc-800 hover:bg-zine-coral transition-colors;
 }

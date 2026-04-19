@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from 'react';
+import { apiFetch } from '@/lib/api';
 
 export default function GlobalSearch() {
   const [query, setQuery] = useState('');
@@ -15,17 +16,16 @@ export default function GlobalSearch() {
     setAnswer('');
     
     try {
-      const res = await fetch('http://localhost:5000/search/global', {
+      const data = await apiFetch('/search/global', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query }),
       });
-      
-      const data = await res.json();
-      setAnswer(data.answer);
-      setSources(data.context || []);
+
+      setAnswer(typeof data?.answer === 'string' ? data.answer : 'NO_RESPONSE_RECEIVED');
+      setSources(Array.isArray(data?.context) ? data.context : []);
     } catch (err) {
-      setAnswer('SYSTEM_ERROR: LVM_UPLINK_OFFLINE');
+      setAnswer(err instanceof Error ? err.message : 'SYSTEM_ERROR: LVM_UPLINK_OFFLINE');
+      setSources([]);
     } finally {
       setIsSearching(false);
     }
@@ -51,8 +51,6 @@ export default function GlobalSearch() {
           {isSearching ? '...' : 'QUERY'}
         </button>
       </form>
-
-      {/* Results HUD */}
       {(answer || isSearching) && (
         <div className="mt-6 zine-card bg-zinc-950 border-double border-4 border-zine-coral p-8 animate-in fade-in slide-in-from-top-4 duration-500">
            <div className="flex justify-between border-b-2 border-zinc-800 pb-2 mb-6">
@@ -68,7 +66,6 @@ export default function GlobalSearch() {
            {isSearching ? (
              <div className="font-mono text-xs animate-pulse text-zinc-500">
                 INITIATING SEMANTIC SEARCH...
-                VECTOR_SYNC_V4.03...
                 COMPILING CONTEXT FROM NODES...
              </div>
            ) : (
