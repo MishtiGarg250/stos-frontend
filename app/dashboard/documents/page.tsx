@@ -6,8 +6,11 @@ import ZineDrawer from '@/components/dashboard/ZineDrawer';
 type DocumentItem = {
   _id: string;
   name: string;
+  url?: string;
+  secureUrl?: string;
   type?: string;
   isProcessed?: boolean;
+  processingError?: string | null;
 };
 
 export default function DocumentsPage() {
@@ -47,6 +50,7 @@ export default function DocumentsPage() {
     if (!file) return;
 
     setIsUploading(true);
+    setFetchError('');
     const formData = new FormData();
     formData.append('file', file);
 
@@ -63,6 +67,7 @@ export default function DocumentsPage() {
       setFetchError(err instanceof Error ? err.message : 'UPLOAD_FAILED');
     } finally {
       setIsUploading(false);
+      e.target.value = '';
     }
   };
 
@@ -89,11 +94,12 @@ export default function DocumentsPage() {
       <div className="flex justify-between items-center group">
         <div>
           <h2 className="text-7xl text-white font-display font-black tracking-tighter transition-all group-hover:tracking-normal duration-500 uppercase italic">ARTIFACTS</h2>
-          <p className="text-xs font-display text-zinc-500 tracking-[0.4em] uppercase mt-2">// ENCRYPTED_STORAGE.FS</p>
+          <p className="text-xs font-display text-zinc-500 tracking-[0.4em] uppercase mt-2">ENCRYPTED_STORAGE.FS</p>
         </div>
         
         <button 
           onClick={() => setIsDrawerOpen(true)}
+          disabled={isUploading}
           className="aether-button border-2 border-black"
         >
            <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
@@ -177,12 +183,22 @@ export default function DocumentsPage() {
                   <span className="font-display font-black text-sm truncate max-w-full text-zinc-300 group-hover:text-white transition-colors uppercase tracking-tight">{doc.name}</span>
                 </div>
                 <div className="col-span-3 font-display text-[10px] font-black uppercase tracking-widest">
-                   <span className={doc.isProcessed ? 'text-zinc-700' : 'text-zine-coral animate-pulse'}>
-                      {doc.isProcessed ? 'Indexed' : 'Processing...'}
+                   <span className={doc.isProcessed ? 'text-zinc-700' : doc.processingError ? 'text-red-500' : 'text-zine-coral animate-pulse'}>
+                      {doc.isProcessed ? 'Indexed' : doc.processingError ? 'Upload_Only' : 'Processing...'}
                    </span>
                 </div>
                 <div className="col-span-3 text-right">
-                  <button className="font-display text-[10px] font-black text-zinc-500 group-hover:text-zine-coral transition-colors uppercase tracking-[0.2em]">Open_Link</button>
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      const docUrl = doc.secureUrl || doc.url;
+                      if (docUrl) window.open(docUrl, '_blank', 'noopener,noreferrer');
+                    }}
+                    className="font-display text-[10px] font-black text-zinc-500 group-hover:text-zine-coral transition-colors uppercase tracking-[0.2em]"
+                  >
+                    Open_Link
+                  </button>
                 </div>
               </div>
             ))}
@@ -194,14 +210,14 @@ export default function DocumentsPage() {
           <div className="lg:col-span-5 aether-card border-zine-coral bg-zine-paper text-zinc-950 flex flex-col min-h-[600px] overflow-hidden animate-in fade-in zoom-in-95 duration-500">
              <div className="p-6 bg-zinc-900 text-white flex justify-between items-center border-b-4 border-zinc-100">
                 <span className="font-display text-[10px] text-zinc-400 font-black uppercase tracking-[0.3em] truncate max-w-[200px]">Node Analysis: {activeChatDoc.name}</span>
-                <button onClick={() => {setActiveChatDoc(null); setChatAnswer('');}} className="text-zinc-500 hover:text-zine-coral transition-colors font-black">✕</button>
+                <button onClick={() => {setActiveChatDoc(null); setChatAnswer('');}} className="text-zinc-500 hover:text-zine-coral transition-colors font-black">X</button>
              </div>
              
              <div className="flex-1 p-10 overflow-y-auto max-h-[400px] relative">
                 {chatAnswer ? (
                   <div className="flex flex-col gap-6">
                      <p className="font-display text-[9px] font-black text-zine-coral uppercase tracking-widest italic animate-aether-pulse">AI_Response_Buffer:</p>
-                     <p className="font-sans text-lg leading-relaxed text-zinc-800 font-bold opacity-90 italic">"{chatAnswer}"</p>
+                     <p className="font-sans text-lg leading-relaxed text-zinc-800 font-bold opacity-90 italic">{chatAnswer}</p>
                   </div>
                 ) : (
                   <div className="h-full flex flex-col items-center justify-center text-center opacity-10 py-20 grayscale">

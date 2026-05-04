@@ -6,9 +6,6 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5005";
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: true,
-  headers: {
-    "Content-Type": "application/json",
-  },
 });
 
 type ApiRequestOptions = {
@@ -23,6 +20,8 @@ export async function apiFetch(path: string, options: ApiRequestOptions = {}) {
 
   try {
     let data = body;
+    const isFormData = typeof FormData !== "undefined" && body instanceof FormData;
+
     // If body is a string (legacy behavior from fetch), parse it back for Axios
     if (typeof body === "string") {
       try {
@@ -32,11 +31,16 @@ export async function apiFetch(path: string, options: ApiRequestOptions = {}) {
       }
     }
 
+    const requestHeaders = {
+      ...(isFormData ? {} : { "Content-Type": "application/json" }),
+      ...headers,
+    };
+
     const response = await axiosInstance({
       url: path,
       method,
       data,
-      headers,
+      headers: requestHeaders,
       responseType: expectJson ? "json" : "text",
     });
 
