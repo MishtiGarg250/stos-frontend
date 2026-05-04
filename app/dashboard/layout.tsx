@@ -1,11 +1,30 @@
+"use client";
 import React from "react";
 import GlobalSearch from "@/components/GlobalSearch";
+import { useAuth } from "@/components/providers/AuthProvider";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function DashboardLayout({ children }:{ children:React.ReactNode }){
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.replace("/login");
+    }
+  }, [user, loading, router]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="font-display text-xs text-zinc-500 tracking-widest uppercase animate-pulse">
+          AUTHENTICATING...
+        </p>
+      </div>
+    );
+  }
+  if (!user) return null;
   return (
     <div className="bg-background text-foreground h-full overflow-hidden flex font-sans">
       <aside className="w-80 bg-zinc-950 border-r-4 border-zine-coral flex flex-col p-10 relative overflow-hidden group">
@@ -25,6 +44,7 @@ export default function DashboardLayout({
               { name: 'NOTES', path: '/dashboard/notes', icon: 'M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z' },
               { name: 'LINKS', path: '/dashboard/links', icon: 'M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1' },
               { name: 'SETTINGS', path: '/dashboard/settings', icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z' },
+              { name: 'TASKS', path: '/dashboard/tasks', icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4' },
             ].map((item) => (
               <a
                 key={item.name}
